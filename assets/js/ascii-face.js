@@ -50,6 +50,26 @@
 
   function clamp(mn, v, mx) { return v < mn ? mn : v > mx ? mx : v; }
 
+  // HSL → RGB  (h, s, l all in [0, 1])
+  function h2r(p, q, t) {
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1/6) return p + (q - p) * 6 * t;
+    if (t < 1/2) return q;
+    if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+    return p;
+  }
+  function hsl(h, s, l) {
+    h = ((h % 1) + 1) % 1;
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    const p = 2 * l - q;
+    return [
+      Math.round(h2r(p, q, h + 1/3) * 255),
+      Math.round(h2r(p, q, h)       * 255),
+      Math.round(h2r(p, q, h - 1/3) * 255)
+    ];
+  }
+
   function drawFace(t) {
     sCtx.clearRect(0, 0, W, H);
     if (!imgReady) return;
@@ -102,14 +122,19 @@
         const ch = RAMP[Math.round((1 - bri) * rampN)];
         if (ch === ' ') continue;
 
-        // Saturation boost: push each channel away from grey
-        const grey = 0.299 * r + 0.587 * g + 0.114 * b;
-        const sat  = 3.0;
-        const sr = clamp(0, Math.round(grey + (r - grey) * sat), 255);
-        const sg = clamp(0, Math.round(grey + (g - grey) * sat), 255);
-        const sb = clamp(0, Math.round(grey + (b - grey) * sat), 255);
+        // Full-spectrum color: brightness maps to hue across the whole rainbow.
+        // Position noise breaks up uniform bands; time rotation keeps it moving.
+        const baseHue = bri * 0.78;                               // dark→red, bright→blue-violet
+        const posVar  = (x * 0.0031 + y * 0.0053) % 1;           // local color scatter
+        const timeRot = (t * 0.045) % 1;                          // slow global cycle
+        const h = (baseHue + posVar * 0.18 + timeRot) % 1;
 
-        oCtx.fillStyle = `rgb(${sr},${sg},${sb})`;
+        // High saturation throughout; lightness dark enough to stay visible
+        const s = 0.95;
+        const l = clamp(0.12, 0.18 + bri * 0.24, 0.42);          // 0.12 (shadow) → 0.42 (lit)
+
+        const [cr, cg, cb] = hsl(h, s, l);
+        oCtx.fillStyle = `rgb(${cr},${cg},${cb})`;
         oCtx.fillText(ch, x * CHAR_W, y * CHAR_H);
       }
     }
