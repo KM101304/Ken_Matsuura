@@ -248,14 +248,30 @@ hr {
   top: 0;
   left: 0;
   pointer-events: none;
-  z-index: -1;
+  z-index: -2;   /* behind the frost layer */
   opacity: 0.72;
 }
 
+/* Frost sits between canvas (-2) and body content (auto/0).
+   backdrop-filter blurs the canvas behind it.
+   body.home must NOT have backdrop-filter — that would create a
+   stacking context that traps the canvas and breaks z-indexing. */
+#frost {
+  position: fixed;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: min(700px, 100%);
+  height: 100%;
+  background: rgba(255, 255, 255, 0.78);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: -1;
+  pointer-events: none;
+}
+
 body.home {
-  background: rgba(255, 255, 255, 0.72);
-  backdrop-filter: blur(7px);
-  -webkit-backdrop-filter: blur(7px);
+  background: transparent;
 }
 
 /* ── Footer ── */

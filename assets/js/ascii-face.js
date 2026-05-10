@@ -10,7 +10,7 @@
   let W, H;
   let img, imgReady = false;
   let lastFrame = 0, t0;
-  const FRAME_MS = 1000 / 24;
+  const FRAME_MS = 1000 / 12;   // 12fps — plenty smooth for a slow background drift
 
   function init() {
     out = document.getElementById('ascii-face');
@@ -71,7 +71,9 @@
   }
 
   function drawFace(t) {
-    sCtx.clearRect(0, 0, W, H);
+    // Dark fill ensures full-viewport coverage — no transparent gaps
+    sCtx.fillStyle = '#06060a';
+    sCtx.fillRect(0, 0, W, H);
     if (!imgReady) return;
 
     const imgAR = img.naturalWidth / img.naturalHeight;
@@ -103,38 +105,38 @@
     drawFace(t);
     const pixels = sCtx.getImageData(0, 0, W, H).data;
 
+    // Build a 64-entry color table once per frame — one HSL call per bucket, not per pixel.
+    // Colors shift with time so the face keeps cycling.
+    const BUCKETS = 64;
+    const timeRot = (t * 0.045) % 1;
+    const colorTable = new Array(BUCKETS);
+    for (let bi = 0; bi < BUCKETS; bi++) {
+      const bv  = bi / (BUCKETS - 1);
+      const h   = (bv * 0.78 + timeRot) % 1;
+      const s   = 0.95;
+      const l   = clamp(0.14, 0.20 + bv * 0.26, 0.46);
+      const [cr, cg, cb] = hsl(h, s, l);
+      colorTable[bi] = `rgb(${cr},${cg},${cb})`;
+    }
+
     oCtx.clearRect(0, 0, out.width, out.height);
+    let lastColor = '';
 
     for (let y = 0; y < H; y++) {
       for (let x = 0; x < W; x++) {
         const i = (y * W + x) * 4;
-        const r = pixels[i], g = pixels[i + 1], b = pixels[i + 2], a = pixels[i + 3];
-        if (a < 8) continue;
+        const r = pixels[i], g = pixels[i + 1], b = pixels[i + 2];
 
-        // Perceptual brightness with aggressive contrast stretch
         let bri = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
         bri = clamp(0, (bri - 0.10) * 1.55, 1);
-
-        // Organic shimmer keeps it alive
         bri += 0.03 * Math.sin(x * 0.72 + t * 4.1) * Math.cos(y * 0.55 - t * 2.9);
         bri  = clamp(0, bri, 1);
 
         const ch = RAMP[Math.round((1 - bri) * rampN)];
         if (ch === ' ') continue;
 
-        // Full-spectrum color: brightness maps to hue across the whole rainbow.
-        // Position noise breaks up uniform bands; time rotation keeps it moving.
-        const baseHue = bri * 0.78;                               // dark→red, bright→blue-violet
-        const posVar  = (x * 0.0031 + y * 0.0053) % 1;           // local color scatter
-        const timeRot = (t * 0.045) % 1;                          // slow global cycle
-        const h = (baseHue + posVar * 0.18 + timeRot) % 1;
-
-        // High saturation throughout; lightness dark enough to stay visible
-        const s = 0.95;
-        const l = clamp(0.12, 0.18 + bri * 0.24, 0.42);          // 0.12 (shadow) → 0.42 (lit)
-
-        const [cr, cg, cb] = hsl(h, s, l);
-        oCtx.fillStyle = `rgb(${cr},${cg},${cb})`;
+        const color = colorTable[Math.round(bri * (BUCKETS - 1))];
+        if (color !== lastColor) { oCtx.fillStyle = color; lastColor = color; }
         oCtx.fillText(ch, x * CHAR_W, y * CHAR_H);
       }
     }
