@@ -7,97 +7,10 @@
   <title>About — Ken Matsuura</title>
   <link rel="stylesheet" href="assets/css/style.css" />
 </head>
-<body>
+<body class="about">
 
-  <!-- ASCII background schematic — fixed behind all content -->
-  <div class="ascii-bg" aria-hidden="true"><pre>
-╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
-║  SYSTEM: ken_matsuura.sh     ARCH: ai-native / systems     MODE: build     STATUS: ● operational                                                                   ║
-╠═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣
-║                                                                                                                                                                     ║
-║    [IDEA] ──────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────────── [WORKING SYSTEM]         ║
-║       │                                                                                                                                              │              ║
-║       │   ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐   ┌──────────┐                   │              ║
-║       │   │          │   │          │   │          │   │          │   │          │   │          │   │          │   │          │                   │              ║
-║       └──▶│  IDEATE  │──▶│   SPEC   │──▶│   ARCH   │──▶│   CODE   │──▶│  BREAK   │──▶│  DEBUG   │──▶│  REFINE  │──▶│   SHIP   │───────────────────┘              ║
-║           │          │   │          │   │          │   │          │   │          │   │          │   │          │   │          │                                    ║
-║           └──────────┘   └──────────┘   └──────────┘   └──────────┘   └────┬─────┘   └────▲────┘   └──────────┘   └──────────┘                                    ║
-║                                                                              │              │                                                                       ║
-║                                                                              └──────────────┘                                                                       ║
-║                                                                                   ↑ loop                                                                            ║
-║                                                                                                                                                                     ║
-╠═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣
-║                                                                                                                                                                     ║
-║    STACK                                                                                                                                                            ║
-║    ─────                                                                                                                                                            ║
-║    [AI / LLM]     OpenAI ── Claude ── local models ── agents ── RAG pipelines ── prompt engineering                                                                ║
-║    [FRONTEND]     React ── Next.js ── Tailwind ── HTML ── CSS ── JavaScript                                                                                        ║
-║    [BACKEND]      Python ── Flask ── Node.js ── REST APIs ── webhooks ── async workers                                                                             ║
-║    [DATABASE]     Supabase ── PostgreSQL ── authentication ── row-level security                                                                                   ║
-║    [AUTOMATION]   n8n ── scraping pipelines ── cron jobs ── data ingestion ── orchestration                                                                        ║
-║    [PAYMENTS]     Stripe ── subscription logic ── webhook handlers ── billing flows                                                                                ║
-║    [INFRA]        GitHub ── Docker ── Linux ── Vercel ── GitHub Pages ── local servers                                                                             ║
-║                                                                                                                                                                     ║
-╠═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣
-║                                                                                                                                                                     ║
-║                                                                                                                                                                     ║
-║           ┌─────────────┐          ┌─────────────┐          ┌─────────────┐          ┌─────────────┐          ┌─────────────┐                                     ║
-║           │             │          │             │          │             │          │             │          │             │                                     ║
-║           │  FRONTEND   │──────────│   BACKEND   │──────────│  DATABASE   │──────────│  PAYMENTS   │──────────│    INFRA    │                                     ║
-║           │             │          │             │          │             │          │             │          │             │                                     ║
-║           └──────┬──────┘          └──────┬──────┘          └──────┬──────┘          └──────┬──────┘          └──────┬──────┘                                     ║
-║                  │                        │                        │                        │                        │                                            ║
-║                  └────────────────────────┼────────────────────────┘                        │                        │                                            ║
-║                                           │                                                 │                        │                                            ║
-║                                  ┌────────▼────────┐                                        │                        │                                            ║
-║                                  │                 │                                        │                        │                                            ║
-║                                  │   AI / AGENTS   │────────────────────────────────────────┘                        │                                            ║
-║                                  │                 │                                                                 │                                            ║
-║                                  └────────┬────────┘                                                                 │                                            ║
-║                                           │                                                                          │                                            ║
-║                                  ┌────────▼────────┐                                                                 │                                            ║
-║                                  │                 │                                                                 │                                            ║
-║                                  │  LIVE SYSTEM    │─────────────────────────────────────────────────────────────────┘                                            ║
-║                                  │                 │                                                                                                              ║
-║                                  └─────────────────┘                                                                                                              ║
-║                                                                                                                                                                     ║
-╠═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣
-║                                                                                                                                                                     ║
-║    PROJECTS                                                                                                                                                         ║
-║    ────────                                                                                                                                                         ║
-║                                                                                                                                                                     ║
-║    ● Hostbid                  marketplace ── TypeScript ── Next.js ── Supabase ── Stripe            [ACTIVE]                                                       ║
-║    ● Burrard Desk             operator dashboard ── React ── Flask ── PostgreSQL                    [ACTIVE / PRIVATE]                                              ║
-║    ● LeadScout AI             lead generation ── TypeScript ── AI pipelines ── scraping             [ACTIVE]                                                       ║
-║    ● Design Submission AI     insurance ── Python ── PDF ingestion ── contradiction detection       [SHIPPED]                                                       ║
-║    ● Financial Dashboard      market data ── Python ── indicators ── cross-asset signals            [ACTIVE]                                                       ║
-║    ● Futuresbot               algorithmic trading ── C++ ── futures markets                         [ACTIVE]                                                       ║
-║    ● Polymarket Bot           prediction markets ── Python ── automated positioning                 [ACTIVE]                                                       ║
-║    ● Cyberdeck (Ferris)       hardware ── OpenSCAD ── custom portable computing                     [BUILT]                                                        ║
-║    ● Repoflow                 tool ── TypeScript ── doomscroll interface for GitHub repos            [SHIPPED]                                                       ║
-║                                                                                                                                                                     ║
-╠═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣
-║                                                                                                                                                                     ║
-║    VERSION HISTORY                                                                                                                                                  ║
-║    ───────────────                                                                                                                                                  ║
-║                                                                                                                                                                     ║
-║    v0.1 → broke on first real user        v0.2 → broke under data volume         v0.3 → schema change crash                                                        ║
-║    v0.4 → auth broke everything           v0.5 → prod only (classic)             v0.6 → payment flow failure                                                       ║
-║    v0.7 → rebuilt from scratch            v0.8 → works locally, not in prod      v1.0 → shipped                                                                    ║
-║                                                                                                                                                                     ║
-╠═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╣
-║                                                                                                                                                                     ║
-║    PRINCIPLES                                                                                                                                                       ║
-║    ──────────                                                                                                                                                       ║
-║                                                                                                                                                                     ║
-║    01 · systems over syntax        understanding how things connect is worth more than memorizing how to write them                                                  ║
-║    02 · ai is a force multiplier   it moves the hard part, it does not remove it                                                                                   ║
-║    03 · debugging is the classroom every error message is a lesson in how things actually behave                                                                    ║
-║    04 · execution over theory      shipping a broken v0.1 teaches more than planning the perfect v1.0                                                               ║
-║    05 · business context matters   software that does not connect to a real problem is just an exercise                                                             ║
-║    06 · tools connect into systems a disconnected set of capabilities is inventory. a connected set is leverage                                                     ║
-║                                                                                                                                                                     ║
-╚═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════════╝</pre></div>
+  <!-- Live ASCII face — canvas-sampled, rendered every frame by ascii-face.js -->
+  <pre id="ascii-face" aria-hidden="true"></pre>
 
   <nav>
     <a href="index.html" class="nav-site">Ken Matsuura</a>
@@ -190,5 +103,6 @@
     © 2026 Ken Matsuura
   </footer>
 
+  <script src="assets/js/ascii-face.js"></script>
 </body>
 </html>

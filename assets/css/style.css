@@ -195,29 +195,31 @@ hr {
   font-style: italic;
 }
 
-/* ── ASCII background ── */
+/* ── ASCII face background (about page) ── */
 
-.ascii-bg {
+#ascii-face {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
+  font-family: monospace;
+  font-size: 9px;
+  line-height: 1.28;
+  color: #000;
+  opacity: 0.13;
+  white-space: pre;
   overflow: hidden;
-  z-index: -1;
   pointer-events: none;
+  z-index: -1;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  letter-spacing: 0;
 }
 
-.ascii-bg pre {
-  font-family: monospace;
-  font-size: 10px;
-  line-height: 1.32;
-  color: #000;
-  opacity: 0.055;
-  white-space: pre;
-  margin: 0;
-  padding: 8px 0 0 8px;
-  user-select: none;
+body.about {
+  background: rgba(255, 255, 255, 0.84);
 }
 
 /* ── Footer ── */
