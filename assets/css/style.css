@@ -209,69 +209,40 @@ hr {
   to   { transform: rotateY(360deg); }
 }
 
-/* ── ASCII animation ── */
+/* ── ASCII face + home page layout ── */
 
-.ascii-animation {
-  margin: 40px 0;
-  border: 1px solid #bbb;
-}
-
-#ascii-story {
-  font-family: monospace;
-  font-size: 12.5px;
-  line-height: 1.5;
-  padding: 20px 24px;
-  min-height: 140px;
-  background: #f9f9f9;
-  white-space: pre;
-  overflow-x: auto;
-  transition: opacity 0.3s ease;
-  margin: 0;
-}
-
-#ascii-caption {
-  font-family: sans-serif;
-  font-size: 12px;
-  color: #666;
-  padding: 8px 16px 10px;
-  margin: 0;
-  border-top: 1px solid #ddd;
-  background: #fff;
-  transition: opacity 0.3s ease;
-  font-style: italic;
-}
-
-/* ── ASCII face background (home page) ── */
-
+/* Canvas sits at z-index 0 in the root stacking context, above the
+   white html background, behind .home-content (z-index 1). */
 #ascii-face {
   position: fixed;
   top: 0;
   left: 0;
   pointer-events: none;
-  z-index: -2;   /* behind the frost layer */
-  opacity: 0.72;
+  z-index: 0;
+  opacity: 0.68;
 }
 
-/* Frost sits between canvas (-2) and body content (auto/0).
-   backdrop-filter blurs the canvas behind it.
-   body.home must NOT have backdrop-filter — that would create a
-   stacking context that traps the canvas and breaks z-indexing. */
-#frost {
-  position: fixed;
-  top: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: min(700px, 100%);
-  height: 100%;
-  background: rgba(255, 255, 255, 0.78);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  z-index: -1;
-  pointer-events: none;
-}
-
+/* .home-content is a stacking context at z-index 1 — above the canvas.
+   Its backdrop-filter correctly blurs the canvas layer behind it.
+   min-height: 100vh eliminates all white space gaps below the content. */
 body.home {
   background: transparent;
+  max-width: none;
+  padding: 0;
+  margin: 0;
+}
+
+.home-content {
+  position: relative;
+  z-index: 1;
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 0 24px 80px;
+  min-height: 100vh;
+  background: rgba(255, 255, 255, 0.84);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  box-sizing: border-box;
 }
 
 /* ── Footer ── */
