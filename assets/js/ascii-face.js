@@ -1,370 +1,343 @@
 (function () {
-  // Monospace chars at 9px are ~2× taller than wide.
-  // Every horizontal measurement on the canvas (in cols) must be multiplied
-  // by ASPECT so the face appears correctly proportioned on screen.
-  const CHAR_W  = 5.5;                    // px per character (Courier New @ 9px)
-  const CHAR_H  = 11.5;                   // px per line (9px × 1.28 line-height)
-  const ASPECT  = CHAR_H / CHAR_W;        // ≈ 2.09 — cols must be wider to look right
+  const CHAR_W = 5.5;
+  const CHAR_H = 11.5;
+  const ASPECT = CHAR_H / CHAR_W;  // ≈ 2.09
 
-  // Dark → light ramp.  We INVERT brightness before indexing so that
-  // dark canvas pixels → dense chars (appear dark on white page) and
-  // bright canvas pixels → sparse chars (appear light / invisible).
   const RAMP = ' .\'`^",:;Il!i~+_-?][}{1)(|/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$';
+  const rampN = RAMP.length - 1;
 
-  let canvas, ctx, pre;
+  let shape, sCtx, out, oCtx;
   let W, H;
-  let rafId, t0;
+  let lastFrame = 0, t0;
+  const FRAME_MS = 1000 / 24;
 
-  // ─── init ────────────────────────────────────────────────────────
   function init() {
-    pre = document.getElementById('ascii-face');
-    if (!pre) return;
+    out = document.getElementById('ascii-face');
+    if (!out) return;
 
-    canvas = document.createElement('canvas');
-    ctx    = canvas.getContext('2d', { willReadFrequently: true });
+    shape = document.createElement('canvas');
+    sCtx  = shape.getContext('2d', { willReadFrequently: true });
+    oCtx  = out.getContext('2d');
 
     resize();
-    window.addEventListener('resize', () => { resize(); });
+    window.addEventListener('resize', resize);
 
     t0 = performance.now();
-    rafId = requestAnimationFrame(loop);
+    requestAnimationFrame(loop);
   }
 
   function resize() {
     W = Math.ceil(window.innerWidth  / CHAR_W);
     H = Math.ceil(window.innerHeight / CHAR_H);
-    canvas.width  = W;
-    canvas.height = H;
+    shape.width  = W;
+    shape.height = H;
+    out.width    = window.innerWidth;
+    out.height   = window.innerHeight;
+    oCtx.font         = '9px monospace';
+    oCtx.textBaseline = 'top';
   }
 
-  let lastFrame = 0;
-  const TARGET_FPS = 24;
-  const FRAME_MS   = 1000 / TARGET_FPS;
-
   function loop(now) {
-    rafId = requestAnimationFrame(loop);
+    requestAnimationFrame(loop);
     if (now - lastFrame < FRAME_MS) return;
     lastFrame = now;
     render((now - t0) / 1000);
   }
 
-  // ─── draw face onto hidden canvas ────────────────────────────────
-  // All x-coordinates are in COLUMN units, y in ROW units.
-  // The face's horizontal extent in columns is stretched by ASPECT so
-  // it looks proportional when each column is ~2× narrower than each row.
+  function clamp(mn, v, mx) { return v < mn ? mn : v > mx ? mx : v; }
+
+  // ─── draw face in full color onto the hidden shape canvas ───────────────────
   function drawFace(t) {
-    ctx.fillStyle = '#000';
-    ctx.fillRect(0, 0, W, H);
+    sCtx.clearRect(0, 0, W, H);
 
-    // Face dimensions — make it large and fill the viewport.
-    const fh = H * 1.28;                      // face height in rows (taller than screen)
-    const fw = fh * 0.72 * ASPECT;            // face width in cols (corrected for aspect)
-
+    const fh = H * 1.28;
+    const fw = fh * 0.72 * ASPECT;
     const cx = W * 0.5;
-    // Position so eyes sit at ~38% down the viewport.
-    const EYE_OFFSET = fh * 0.10;             // eyes are 10% above face center
+    const EYE_OFFSET = fh * 0.10;
     const cy = H * 0.38 + EYE_OFFSET;
 
-    // Rotating key light
+    // Slowly rotating key light
     const angle = t * 0.38;
     const lx = cx + Math.cos(angle)        * fw * 0.55;
     const ly = cy + Math.sin(angle * 0.55) * fh * 0.18 - fh * 0.05;
 
-    // ── Face oval ──
-    ctx.save();
-    ctx.beginPath();
-    ctx.ellipse(cx, cy, fw / 2, fh / 2, 0, 0, Math.PI * 2);
-    ctx.clip();
+    // ── Face oval ──────────────────────────────────────────────────────────────
+    sCtx.save();
+    sCtx.beginPath();
+    sCtx.ellipse(cx, cy, fw / 2, fh / 2, 0, 0, Math.PI * 2);
+    sCtx.clip();
 
-    // Skin base
-    const skin = ctx.createRadialGradient(cx, cy - fh * 0.04, 0, cx, cy, fh * 0.62);
-    skin.addColorStop(0,    '#d5d5d5');
-    skin.addColorStop(0.45, '#a0a0a0');
-    skin.addColorStop(0.78, '#5a5a5a');
-    skin.addColorStop(1,    '#111');
-    ctx.fillStyle = skin;
-    ctx.fillRect(0, 0, W, H);
+    // Skin tone gradient — warm highlights to deep shadow
+    const skin = sCtx.createRadialGradient(cx, cy - fh * 0.04, 0, cx, cy, fh * 0.62);
+    skin.addColorStop(0,    '#f2c090');
+    skin.addColorStop(0.45, '#d4845a');
+    skin.addColorStop(0.78, '#9a4c28');
+    skin.addColorStop(1,    '#5c2510');
+    sCtx.fillStyle = skin;
+    sCtx.fillRect(0, 0, W, H);
 
-    // Key light
-    const kl = ctx.createRadialGradient(lx, ly, 0, lx, ly, fw * 0.88);
-    kl.addColorStop(0,    'rgba(255,255,255,0.60)');
-    kl.addColorStop(0.38, 'rgba(255,255,255,0.26)');
+    // Key light (warm)
+    const kl = sCtx.createRadialGradient(lx, ly, 0, lx, ly, fw * 0.88);
+    kl.addColorStop(0,    'rgba(255,240,210,0.58)');
+    kl.addColorStop(0.38, 'rgba(255,220,180,0.24)');
     kl.addColorStop(1,    'rgba(0,0,0,0)');
-    ctx.fillStyle = kl;
-    ctx.fillRect(0, 0, W, H);
+    sCtx.fillStyle = kl;
+    sCtx.fillRect(0, 0, W, H);
 
-    // Rim light (opposite side)
+    // Rim light
     const rlx = cx - (lx - cx) * 0.4;
     const rly = cy - (ly - cy) * 0.3;
-    const rl  = ctx.createRadialGradient(rlx, rly, 0, rlx, rly, fw * 0.7);
-    rl.addColorStop(0, 'rgba(180,180,180,0.18)');
+    const rl = sCtx.createRadialGradient(rlx, rly, 0, rlx, rly, fw * 0.7);
+    rl.addColorStop(0, 'rgba(200,150,110,0.18)');
     rl.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = rl;
-    ctx.fillRect(0, 0, W, H);
+    sCtx.fillStyle = rl;
+    sCtx.fillRect(0, 0, W, H);
 
-    ctx.restore();
+    sCtx.restore();
 
-    // ── Hair ──
-    ctx.save();
-    // Top mass
-    ctx.beginPath();
-    ctx.ellipse(cx, cy - fh * 0.3, fw * 0.52, fh * 0.34, 0, Math.PI, Math.PI * 2);
-    ctx.fillStyle = '#090909';
-    ctx.fill();
-    // Sides
+    // ── Hair ───────────────────────────────────────────────────────────────────
+    sCtx.save();
+    sCtx.beginPath();
+    sCtx.ellipse(cx, cy - fh * 0.3, fw * 0.52, fh * 0.34, 0, Math.PI, Math.PI * 2);
+    sCtx.fillStyle = '#0e0400';
+    sCtx.fill();
     for (const s of [-1, 1]) {
-      ctx.beginPath();
-      ctx.ellipse(cx + s * fw * 0.44, cy - fh * 0.14, fw * 0.12, fh * 0.24, s * 0.1, 0, Math.PI * 2);
-      ctx.fillStyle = '#090909';
-      ctx.fill();
-      // Hair shadow onto face
-      const hs = ctx.createRadialGradient(cx + s * fw * 0.45, cy, 0, cx + s * fw * 0.45, cy, fw * 0.22);
-      hs.addColorStop(0, 'rgba(0,0,0,0.55)');
-      hs.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = hs;
-      ctx.fillRect(0, 0, W, H);
+      sCtx.beginPath();
+      sCtx.ellipse(cx + s * fw * 0.44, cy - fh * 0.14, fw * 0.12, fh * 0.24, s * 0.1, 0, Math.PI * 2);
+      sCtx.fillStyle = '#0e0400';
+      sCtx.fill();
+      const hs = sCtx.createRadialGradient(cx + s * fw * 0.45, cy, 0, cx + s * fw * 0.45, cy, fw * 0.22);
+      hs.addColorStop(0, 'rgba(20,5,0,0.55)');
+      hs.addColorStop(1, 'rgba(20,5,0,0)');
+      sCtx.fillStyle = hs;
+      sCtx.fillRect(0, 0, W, H);
     }
-    ctx.restore();
+    sCtx.restore();
 
-    // ── Shared eye measurements ──
-    const eyY  = cy - EYE_OFFSET;             // eye center row
-    const eyX  = fw * 0.195;                  // half-distance between eyes (cols)
-    // For a ~3:1 eye ratio on screen: erx_screen / ery_screen = 3
-    // erx*CHAR_W / (ery*CHAR_H) = 3  →  erx = 3 * ery * ASPECT
-    const ery  = fh * 0.030;                  // eye half-height in rows
-    const erx  = ery * 3 * ASPECT;            // eye half-width in cols (proportional)
+    // ── Eye geometry ───────────────────────────────────────────────────────────
+    const eyY  = cy - EYE_OFFSET;
+    const eyX  = fw * 0.195;
+    const ery  = fh * 0.030;
+    const erx  = ery * 3 * ASPECT;
     const browY = eyY - ery * 4.2;
 
-    // ── Eyebrows ──
-    ctx.lineWidth = ery * 1.2;
-    ctx.lineCap   = 'round';
+    // ── Eyebrows ───────────────────────────────────────────────────────────────
+    sCtx.lineWidth = ery * 1.2;
+    sCtx.lineCap   = 'round';
     for (const s of [-1, 1]) {
       const ex = cx + s * eyX;
-      ctx.beginPath();
-      ctx.moveTo(ex - erx * 1.1, browY + ery * (s < 0 ?  0.6 : -0.6));
-      ctx.quadraticCurveTo(ex, browY - ery * 1.4,
-                           ex + erx * 1.1, browY + ery * (s < 0 ? -0.6 :  0.6));
-      ctx.strokeStyle = 'rgba(6,6,6,0.92)';
-      ctx.stroke();
+      sCtx.beginPath();
+      sCtx.moveTo(ex - erx * 1.1, browY + ery * (s < 0 ?  0.6 : -0.6));
+      sCtx.quadraticCurveTo(ex, browY - ery * 1.4,
+                            ex + erx * 1.1, browY + ery * (s < 0 ? -0.6 :  0.6));
+      sCtx.strokeStyle = 'rgba(16,5,0,0.92)';
+      sCtx.stroke();
     }
 
-    // ── Eyes ──
+    // ── Eyes ───────────────────────────────────────────────────────────────────
     for (const s of [-1, 1]) {
       const ex = cx + s * eyX;
 
       // Socket shadow
-      const sock = ctx.createRadialGradient(ex, eyY, 0, ex, eyY, erx * 1.8);
-      sock.addColorStop(0,    'rgba(0,0,0,0.7)');
-      sock.addColorStop(0.55, 'rgba(0,0,0,0.35)');
-      sock.addColorStop(1,    'rgba(0,0,0,0)');
-      ctx.fillStyle = sock;
-      ctx.beginPath();
-      ctx.ellipse(ex, eyY, erx * 1.85, ery * 3.0, 0, 0, Math.PI * 2);
-      ctx.fill();
+      const sock = sCtx.createRadialGradient(ex, eyY, 0, ex, eyY, erx * 1.8);
+      sock.addColorStop(0,    'rgba(40,10,0,0.70)');
+      sock.addColorStop(0.55, 'rgba(40,10,0,0.35)');
+      sock.addColorStop(1,    'rgba(40,10,0,0)');
+      sCtx.fillStyle = sock;
+      sCtx.beginPath();
+      sCtx.ellipse(ex, eyY, erx * 1.85, ery * 3.0, 0, 0, Math.PI * 2);
+      sCtx.fill();
 
-      // Eyelid clip
-      ctx.save();
-      ctx.beginPath();
-      ctx.ellipse(ex, eyY, erx, ery, 0, 0, Math.PI * 2);
-      ctx.clip();
+      sCtx.save();
+      sCtx.beginPath();
+      sCtx.ellipse(ex, eyY, erx, ery, 0, 0, Math.PI * 2);
+      sCtx.clip();
 
-      ctx.fillStyle = '#e8e8e8';
-      ctx.fillRect(ex - erx, eyY - ery, erx * 2, ery * 2);
+      // Sclera
+      sCtx.fillStyle = '#e8ddd0';
+      sCtx.fillRect(ex - erx, eyY - ery, erx * 2, ery * 2);
 
-      // Iris
-      const iris = ctx.createRadialGradient(ex, eyY, 0, ex, eyY, ery * 0.92);
-      iris.addColorStop(0,   '#58637a');
-      iris.addColorStop(0.5, '#2e3548');
-      iris.addColorStop(1,   '#0d1020');
-      ctx.fillStyle = iris;
-      ctx.beginPath();
-      ctx.arc(ex, eyY, ery * 0.92, 0, Math.PI * 2);
-      ctx.fill();
+      // Iris (blue-grey)
+      const iris = sCtx.createRadialGradient(ex, eyY, 0, ex, eyY, ery * 0.92);
+      iris.addColorStop(0,   '#6a9ad8');
+      iris.addColorStop(0.5, '#3a6aaa');
+      iris.addColorStop(1,   '#0d2050');
+      sCtx.fillStyle = iris;
+      sCtx.beginPath();
+      sCtx.arc(ex, eyY, ery * 0.92, 0, Math.PI * 2);
+      sCtx.fill();
 
       // Pupil
-      ctx.fillStyle = '#000';
-      ctx.beginPath();
-      ctx.arc(ex, eyY, ery * 0.45, 0, Math.PI * 2);
-      ctx.fill();
+      sCtx.fillStyle = '#04020a';
+      sCtx.beginPath();
+      sCtx.arc(ex, eyY, ery * 0.45, 0, Math.PI * 2);
+      sCtx.fill();
 
       // Catchlight
-      ctx.fillStyle = 'rgba(255,255,255,0.95)';
-      ctx.beginPath();
-      ctx.arc(ex - ery * 0.32, eyY - ery * 0.3, ery * 0.2, 0, Math.PI * 2);
-      ctx.fill();
+      sCtx.fillStyle = 'rgba(255,255,255,0.95)';
+      sCtx.beginPath();
+      sCtx.arc(ex - ery * 0.32, eyY - ery * 0.3, ery * 0.2, 0, Math.PI * 2);
+      sCtx.fill();
 
-      ctx.restore();
+      sCtx.restore();
 
-      // Lid edge
-      ctx.beginPath();
-      ctx.ellipse(ex, eyY, erx, ery, 0, 0, Math.PI * 2);
-      ctx.lineWidth   = 0.7;
-      ctx.strokeStyle = 'rgba(0,0,0,0.55)';
-      ctx.stroke();
+      sCtx.beginPath();
+      sCtx.ellipse(ex, eyY, erx, ery, 0, 0, Math.PI * 2);
+      sCtx.lineWidth   = 0.7;
+      sCtx.strokeStyle = 'rgba(20,5,0,0.55)';
+      sCtx.stroke();
 
       // Under-eye shadow
-      const ue = ctx.createRadialGradient(ex, eyY + ery * 1.7, 0, ex, eyY + ery * 1.7, erx * 1.1);
-      ue.addColorStop(0, 'rgba(0,0,0,0.28)');
-      ue.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = ue;
-      ctx.fillRect(0, 0, W, H);
+      const ue = sCtx.createRadialGradient(ex, eyY + ery * 1.7, 0, ex, eyY + ery * 1.7, erx * 1.1);
+      ue.addColorStop(0, 'rgba(80,20,0,0.28)');
+      ue.addColorStop(1, 'rgba(80,20,0,0)');
+      sCtx.fillStyle = ue;
+      sCtx.fillRect(0, 0, W, H);
     }
 
-    // ── Nose ──
-    // Nose measurements in same corrected units
-    const nW    = fw  * 0.12;              // nostril spread (cols)
-    const nBaseY = eyY + fh * 0.18;        // nose base row
-    const nTipY  = eyY + fh * 0.135;       // nose tip row
+    // ── Nose ───────────────────────────────────────────────────────────────────
+    const nW     = fw  * 0.12;
+    const nBaseY = eyY + fh * 0.18;
+    const nTipY  = eyY + fh * 0.135;
 
-    // Bridge highlight
-    const bh = ctx.createLinearGradient(cx - nW * 0.3, eyY + ery * 2, cx + nW * 0.3, nBaseY);
-    bh.addColorStop(0,   'rgba(255,255,255,0)');
-    bh.addColorStop(0.4, 'rgba(255,255,255,0.22)');
-    bh.addColorStop(1,   'rgba(255,255,255,0)');
-    ctx.fillStyle = bh;
-    ctx.beginPath();
-    ctx.ellipse(cx, nTipY, nW * 0.28, fh * 0.062, 0, 0, Math.PI * 2);
-    ctx.fill();
+    const bh = sCtx.createLinearGradient(cx - nW * 0.3, eyY + ery * 2, cx + nW * 0.3, nBaseY);
+    bh.addColorStop(0,   'rgba(255,220,180,0)');
+    bh.addColorStop(0.4, 'rgba(255,220,180,0.22)');
+    bh.addColorStop(1,   'rgba(255,220,180,0)');
+    sCtx.fillStyle = bh;
+    sCtx.beginPath();
+    sCtx.ellipse(cx, nTipY, nW * 0.28, fh * 0.062, 0, 0, Math.PI * 2);
+    sCtx.fill();
 
-    // Nostril shadows
     for (const s of [-1, 1]) {
-      const ns = ctx.createRadialGradient(cx + s * nW * 0.88, nBaseY, 0,
-                                          cx + s * nW * 0.88, nBaseY, nW * 0.85);
-      ns.addColorStop(0, 'rgba(0,0,0,0.52)');
-      ns.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = ns;
-      ctx.beginPath();
-      ctx.ellipse(cx + s * nW * 0.88, nBaseY, nW * 0.82, fh * 0.048, 0, 0, Math.PI * 2);
-      ctx.fill();
+      const ns = sCtx.createRadialGradient(cx + s * nW * 0.88, nBaseY, 0,
+                                           cx + s * nW * 0.88, nBaseY, nW * 0.85);
+      ns.addColorStop(0, 'rgba(50,15,0,0.52)');
+      ns.addColorStop(1, 'rgba(50,15,0,0)');
+      sCtx.fillStyle = ns;
+      sCtx.beginPath();
+      sCtx.ellipse(cx + s * nW * 0.88, nBaseY, nW * 0.82, fh * 0.048, 0, 0, Math.PI * 2);
+      sCtx.fill();
     }
 
-    // Nostrils
     for (const s of [-1, 1]) {
-      ctx.fillStyle = 'rgba(0,0,0,0.75)';
-      ctx.beginPath();
-      ctx.ellipse(cx + s * nW * 0.7, nBaseY + fh * 0.02,
-                  nW * 0.36, fh * 0.022, s * 0.35, 0, Math.PI * 2);
-      ctx.fill();
+      sCtx.fillStyle = 'rgba(30,5,0,0.75)';
+      sCtx.beginPath();
+      sCtx.ellipse(cx + s * nW * 0.7, nBaseY + fh * 0.02,
+                   nW * 0.36, fh * 0.022, s * 0.35, 0, Math.PI * 2);
+      sCtx.fill();
     }
 
-    // Tip highlight
-    const th = ctx.createRadialGradient(cx, nTipY, 0, cx, nTipY, nW * 0.7);
-    th.addColorStop(0, 'rgba(255,255,255,0.3)');
-    th.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = th;
-    ctx.fillRect(0, 0, W, H);
+    const th = sCtx.createRadialGradient(cx, nTipY, 0, cx, nTipY, nW * 0.7);
+    th.addColorStop(0, 'rgba(255,210,170,0.3)');
+    th.addColorStop(1, 'rgba(255,210,170,0)');
+    sCtx.fillStyle = th;
+    sCtx.fillRect(0, 0, W, H);
 
-    // ── Mouth ──
+    // ── Mouth ──────────────────────────────────────────────────────────────────
     const mY = eyY + fh * 0.26;
     const mW = fw  * 0.22;
     const lH = fh  * 0.040;
 
-    // Philtrum shadow
-    const ph = ctx.createRadialGradient(cx, nBaseY + fh * 0.04, 0, cx, nBaseY + fh * 0.04, nW * 0.5);
-    ph.addColorStop(0, 'rgba(0,0,0,0.22)');
-    ph.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = ph;
-    ctx.fillRect(0, 0, W, H);
+    const ph = sCtx.createRadialGradient(cx, nBaseY + fh * 0.04, 0, cx, nBaseY + fh * 0.04, nW * 0.5);
+    ph.addColorStop(0, 'rgba(60,15,0,0.22)');
+    ph.addColorStop(1, 'rgba(60,15,0,0)');
+    sCtx.fillStyle = ph;
+    sCtx.fillRect(0, 0, W, H);
 
-    // Lips
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(cx - mW, mY);
-    ctx.bezierCurveTo(cx - mW * 0.52, mY - lH * 0.58,
-                      cx - mW * 0.13, mY - lH * 1.18, cx,             mY - lH * 0.92);
-    ctx.bezierCurveTo(cx + mW * 0.13, mY - lH * 1.18,
-                      cx + mW * 0.52, mY - lH * 0.58, cx + mW,        mY);
-    ctx.bezierCurveTo(cx + mW * 0.6,  mY + lH * 1.28,
-                      cx - mW * 0.6,  mY + lH * 1.28, cx - mW,        mY);
-    ctx.closePath();
-    const lg = ctx.createLinearGradient(cx, mY - lH, cx, mY + lH * 1.28);
-    lg.addColorStop(0,   '#8a8a8a');
-    lg.addColorStop(0.4, '#787878');
-    lg.addColorStop(1,   '#484848');
-    ctx.fillStyle = lg;
-    ctx.fill();
-    // Lower lip highlight
-    ctx.beginPath();
-    ctx.ellipse(cx, mY + lH * 0.65, mW * 0.32, lH * 0.42, 0, 0, Math.PI * 2);
-    ctx.fillStyle = 'rgba(255,255,255,0.22)';
-    ctx.fill();
-    ctx.restore();
+    sCtx.save();
+    sCtx.beginPath();
+    sCtx.moveTo(cx - mW, mY);
+    sCtx.bezierCurveTo(cx - mW * 0.52, mY - lH * 0.58,
+                       cx - mW * 0.13, mY - lH * 1.18, cx,        mY - lH * 0.92);
+    sCtx.bezierCurveTo(cx + mW * 0.13, mY - lH * 1.18,
+                       cx + mW * 0.52, mY - lH * 0.58, cx + mW,   mY);
+    sCtx.bezierCurveTo(cx + mW * 0.6,  mY + lH * 1.28,
+                       cx - mW * 0.6,  mY + lH * 1.28, cx - mW,   mY);
+    sCtx.closePath();
+    const lg = sCtx.createLinearGradient(cx, mY - lH, cx, mY + lH * 1.28);
+    lg.addColorStop(0,   '#e07070');
+    lg.addColorStop(0.4, '#c05050');
+    lg.addColorStop(1,   '#803030');
+    sCtx.fillStyle = lg;
+    sCtx.fill();
+    sCtx.beginPath();
+    sCtx.ellipse(cx, mY + lH * 0.65, mW * 0.32, lH * 0.42, 0, 0, Math.PI * 2);
+    sCtx.fillStyle = 'rgba(255,200,180,0.28)';
+    sCtx.fill();
+    sCtx.restore();
 
-    // Lip crease
-    ctx.beginPath();
-    ctx.moveTo(cx - mW, mY);
-    ctx.bezierCurveTo(cx - mW * 0.3, mY + lH * 0.15,
-                      cx + mW * 0.3, mY + lH * 0.15, cx + mW, mY);
-    ctx.lineWidth   = 1.1;
-    ctx.strokeStyle = 'rgba(0,0,0,0.58)';
-    ctx.stroke();
+    sCtx.beginPath();
+    sCtx.moveTo(cx - mW, mY);
+    sCtx.bezierCurveTo(cx - mW * 0.3, mY + lH * 0.15,
+                       cx + mW * 0.3, mY + lH * 0.15, cx + mW, mY);
+    sCtx.lineWidth   = 1.1;
+    sCtx.strokeStyle = 'rgba(60,10,0,0.58)';
+    sCtx.stroke();
 
-    // Mouth corner shadows
     for (const s of [-1, 1]) {
-      const cs = ctx.createRadialGradient(cx + s * mW, mY, 0, cx + s * mW, mY, mW * 0.25);
-      cs.addColorStop(0, 'rgba(0,0,0,0.44)');
-      cs.addColorStop(1, 'rgba(0,0,0,0)');
-      ctx.fillStyle = cs;
-      ctx.fillRect(0, 0, W, H);
+      const cs = sCtx.createRadialGradient(cx + s * mW, mY, 0, cx + s * mW, mY, mW * 0.25);
+      cs.addColorStop(0, 'rgba(60,10,0,0.44)');
+      cs.addColorStop(1, 'rgba(60,10,0,0)');
+      sCtx.fillStyle = cs;
+      sCtx.fillRect(0, 0, W, H);
     }
 
-    // ── Jaw / chin shadow ──
-    const jaw = ctx.createRadialGradient(cx, cy + fh * 0.44, 0, cx, cy + fh * 0.44, fw * 0.42);
-    jaw.addColorStop(0, 'rgba(0,0,0,0.3)');
-    jaw.addColorStop(1, 'rgba(0,0,0,0)');
-    ctx.fillStyle = jaw;
-    ctx.fillRect(0, 0, W, H);
+    // ── Jaw shadow ─────────────────────────────────────────────────────────────
+    const jaw = sCtx.createRadialGradient(cx, cy + fh * 0.44, 0, cx, cy + fh * 0.44, fw * 0.42);
+    jaw.addColorStop(0, 'rgba(40,10,0,0.3)');
+    jaw.addColorStop(1, 'rgba(40,10,0,0)');
+    sCtx.fillStyle = jaw;
+    sCtx.fillRect(0, 0, W, H);
 
-    // ── Neck ──
+    // ── Neck ───────────────────────────────────────────────────────────────────
     const nkW   = fw  * 0.24;
     const nkTop = cy  + fh * 0.48;
 
-    ctx.save();
-    ctx.beginPath();
-    ctx.moveTo(cx - nkW, nkTop);
-    ctx.lineTo(cx - nkW * 1.2, H + 4);
-    ctx.lineTo(cx + nkW * 1.2, H + 4);
-    ctx.lineTo(cx + nkW, nkTop);
-    ctx.closePath();
-    ctx.clip();
+    sCtx.save();
+    sCtx.beginPath();
+    sCtx.moveTo(cx - nkW, nkTop);
+    sCtx.lineTo(cx - nkW * 1.2, H + 4);
+    sCtx.lineTo(cx + nkW * 1.2, H + 4);
+    sCtx.lineTo(cx + nkW, nkTop);
+    sCtx.closePath();
+    sCtx.clip();
 
-    const nk = ctx.createLinearGradient(cx - nkW, nkTop, cx + nkW, nkTop);
-    nk.addColorStop(0,    '#1a1a1a');
-    nk.addColorStop(0.28, '#888');
-    nk.addColorStop(0.5,  '#bbb');
-    nk.addColorStop(0.72, '#888');
-    nk.addColorStop(1,    '#1a1a1a');
-    ctx.fillStyle = nk;
-    ctx.fillRect(0, 0, W, H);
-    ctx.restore();
+    const nk = sCtx.createLinearGradient(cx - nkW, nkTop, cx + nkW, nkTop);
+    nk.addColorStop(0,    '#5c2510');
+    nk.addColorStop(0.28, '#a85a38');
+    nk.addColorStop(0.5,  '#d48060');
+    nk.addColorStop(0.72, '#a85a38');
+    nk.addColorStop(1,    '#5c2510');
+    sCtx.fillStyle = nk;
+    sCtx.fillRect(0, 0, W, H);
+    sCtx.restore();
   }
 
-  // ─── canvas pixels → ASCII string ────────────────────────────────
+  // ─── sample color + brightness → draw colored chars on output canvas ────────
   function render(t) {
     drawFace(t);
+    const pixels = sCtx.getImageData(0, 0, W, H).data;
 
-    const pixels = ctx.getImageData(0, 0, W, H).data;
-    const rampN  = RAMP.length - 1;
-    const lines  = new Array(H);
+    oCtx.clearRect(0, 0, out.width, out.height);
 
     for (let y = 0; y < H; y++) {
-      const row = new Array(W);
       for (let x = 0; x < W; x++) {
         const i = (y * W + x) * 4;
-        // Perceptual brightness
-        let b = (0.299 * pixels[i] + 0.587 * pixels[i + 1] + 0.114 * pixels[i + 2]) / 255;
+        const r = pixels[i], g = pixels[i + 1], b = pixels[i + 2], a = pixels[i + 3];
+        if (a < 8) continue;
 
-        // Small organic shimmer that keeps the face alive when lighting is static
-        b += 0.04 * Math.sin(x * 0.72 + t * 4.1) * Math.cos(y * 0.55 - t * 2.9);
-        b  = b < 0 ? 0 : b > 1 ? 1 : b;
+        let brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+        brightness += 0.04 * Math.sin(x * 0.72 + t * 4.1) * Math.cos(y * 0.55 - t * 2.9);
+        brightness  = clamp(0, brightness, 1);
 
-        // Invert: dark canvas pixel → dense char (dark on white page)
-        row[x] = RAMP[Math.round((1 - b) * rampN)];
+        const ch = RAMP[Math.round((1 - brightness) * rampN)];
+        if (ch === ' ') continue;
+
+        oCtx.fillStyle = `rgb(${r},${g},${b})`;
+        oCtx.fillText(ch, x * CHAR_W, y * CHAR_H);
       }
-      lines[y] = row.join('');
     }
-
-    pre.textContent = lines.join('\n');
   }
 
   document.addEventListener('DOMContentLoaded', init);

@@ -199,30 +199,18 @@ hr {
   font-style: italic;
 }
 
-/* ── ASCII face background (about page) ── */
+/* ── ASCII face background (home page) ── */
 
 #ascii-face {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100vw;
-  height: 100vh;
-  font-family: monospace;
-  font-size: 9px;
-  line-height: 1.28;
-  color: #000;
-  opacity: 0.20;
-  white-space: pre;
-  overflow: hidden;
   pointer-events: none;
   z-index: -1;
-  margin: 0;
-  padding: 0;
-  user-select: none;
-  letter-spacing: 0;
+  opacity: 0.28;
 }
 
-body.about {
+body.home {
   background: transparent;
 }
 
