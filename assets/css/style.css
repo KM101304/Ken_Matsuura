@@ -28,9 +28,9 @@ a:hover {
 /* ── Nav ── */
 
 nav {
-  padding: 18px 0 16px;
-  border-bottom: 1px solid #000;
-  margin-bottom: 52px;
+  padding: 22px 0 18px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.15);
+  margin-bottom: 48px;
   display: flex;
   align-items: baseline;
   gap: 0;
@@ -39,9 +39,10 @@ nav {
 .nav-site {
   font-weight: bold;
   font-size: 16px;
+  letter-spacing: -0.01em;
   color: #111;
   text-decoration: none;
-  margin-right: 28px;
+  margin-right: 32px;
 }
 
 .nav-site:visited {
@@ -50,10 +51,13 @@ nav {
 
 nav a {
   font-family: sans-serif;
-  font-size: 13px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
   color: #555;
   text-decoration: none;
-  margin-right: 20px;
+  margin-right: 22px;
 }
 
 nav a:visited {
@@ -63,6 +67,7 @@ nav a:visited {
 nav a.active {
   color: #111;
   text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 nav a:hover {
@@ -72,10 +77,11 @@ nav a:hover {
 /* ── Typography ── */
 
 h1 {
-  font-size: 28px;
+  font-size: 34px;
   font-weight: normal;
+  letter-spacing: -0.02em;
   margin: 36px 0 6px;
-  line-height: 1.2;
+  line-height: 1.15;
 }
 
 h2 {
@@ -237,23 +243,26 @@ body.home {
   z-index: 1;
   max-width: 700px;
   margin: 0 auto;
-  padding: 0 24px 80px;
+  padding: 16px 16px 48px;
   min-height: 100vh;
   background: transparent;
   box-sizing: border-box;
 }
 
-/* Frosted glass only behind each text element — ASCII art shows
-   in all the gaps between them. */
-.home-content nav,
-.home-content h1,
-.home-content h2,
-.home-content p,
-.home-content ul,
-.home-content footer {
-  background: rgba(255, 255, 255, 0.82);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
+/* Single continuous Apple-style glass panel.
+   One smooth surface beats per-element blobs every time.
+   saturate(180%) pulls the colorful ASCII art through the glass. */
+.glass-card {
+  background: rgba(255, 255, 255, 0.58);
+  backdrop-filter: blur(32px) saturate(180%);
+  -webkit-backdrop-filter: blur(32px) saturate(180%);
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.75);
+  box-shadow:
+    0 8px 32px rgba(0, 0, 0, 0.10),
+    0 2px 6px  rgba(0, 0, 0, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.95);
+  padding: 0 32px 48px;
 }
 
 /* ── Footer ── */
