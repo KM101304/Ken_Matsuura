@@ -195,6 +195,31 @@ hr {
   font-style: italic;
 }
 
+/* ── ASCII background ── */
+
+.ascii-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  z-index: -1;
+  pointer-events: none;
+}
+
+.ascii-bg pre {
+  font-family: monospace;
+  font-size: 10px;
+  line-height: 1.32;
+  color: #000;
+  opacity: 0.055;
+  white-space: pre;
+  margin: 0;
+  padding: 8px 0 0 8px;
+  user-select: none;
+}
+
 /* ── Footer ── */
 
 footer {
