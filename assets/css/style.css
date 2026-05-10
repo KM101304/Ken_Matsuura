@@ -245,6 +245,34 @@ body.home {
   box-sizing: border-box;
 }
 
+/* On mobile the content column fills the full width so the glass hides
+   the canvas entirely. Drop to near-transparent and use text-shadow to
+   keep the text legible over the colorful ASCII background. */
+@media (max-width: 700px) {
+  .home-content {
+    background: rgba(255, 255, 255, 0.14);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
+  }
+
+  .home-content h1,
+  .home-content h2,
+  .home-content p,
+  .home-content li,
+  .home-content a,
+  .home-content .subtitle,
+  .home-content footer {
+    text-shadow:
+      0 0 10px rgba(255,255,255,1),
+      0 0 6px  rgba(255,255,255,1),
+      0 0 2px  rgba(255,255,255,0.9);
+  }
+
+  .home-content nav {
+    border-bottom-color: rgba(0, 0, 0, 0.35);
+  }
+}
+
 /* ── Footer ── */
 
 footer {
