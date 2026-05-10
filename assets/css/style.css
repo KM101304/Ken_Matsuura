@@ -167,25 +167,15 @@ hr {
   margin-bottom: 4px;
 }
 
-/* ── Rotating cube (N3C project) ── */
+/* ── Rotating cube (N3C project easter egg) ── */
 
-.project-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 20px;
-}
-
-.project-header-text {
-  flex: 1;
-  min-width: 0;
-}
-
-.cube-container {
-  flex-shrink: 0;
-  perspective: 600px;
-  width: 90px;
-  height: 90px;
-  margin-top: 4px;
+#n3c .cube-container {
+  float: right;
+  margin: 0 0 12px 20px;
+  perspective: 500px;
+  width: 68px;
+  height: 68px;
+  opacity: 0.78;
 }
 
 .cube {
@@ -193,31 +183,30 @@ hr {
   height: 100%;
   position: relative;
   transform-style: preserve-3d;
-  animation: rotateCube 10s linear infinite;
+  animation: rotateCubeY 12s linear infinite;
 }
 
 .cube-face {
   position: absolute;
-  width: 90px;
-  height: 90px;
+  width: 68px;
+  height: 68px;
   background-image: url('../img/n3c-banner.jpg');
   background-size: cover;
   background-position: center;
-  border: 1px solid #aaa;
+  border: 1px solid #bbb;
   box-sizing: border-box;
-  opacity: 0.92;
 }
 
-.cube-face.front  { transform: rotateY(  0deg) translateZ(45px); }
-.cube-face.back   { transform: rotateY(180deg) translateZ(45px); }
-.cube-face.right  { transform: rotateY( 90deg) translateZ(45px); }
-.cube-face.left   { transform: rotateY(-90deg) translateZ(45px); }
-.cube-face.top    { transform: rotateX( 90deg) translateZ(45px); }
-.cube-face.bottom { transform: rotateX(-90deg) translateZ(45px); }
+.cube-face.front  { transform: rotateY(  0deg) translateZ(34px); }
+.cube-face.back   { transform: rotateY(180deg) translateZ(34px); }
+.cube-face.right  { transform: rotateY( 90deg) translateZ(34px); }
+.cube-face.left   { transform: rotateY(-90deg) translateZ(34px); }
+.cube-face.top    { transform: rotateX( 90deg) translateZ(34px); }
+.cube-face.bottom { transform: rotateX(-90deg) translateZ(34px); }
 
-@keyframes rotateCube {
-  from { transform: rotateX(0deg)   rotateY(0deg); }
-  to   { transform: rotateX(360deg) rotateY(360deg); }
+@keyframes rotateCubeY {
+  from { transform: rotateY(  0deg); }
+  to   { transform: rotateY(360deg); }
 }
 
 /* ── ASCII animation ── */
@@ -264,7 +253,9 @@ hr {
 }
 
 body.home {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.72);
+  backdrop-filter: blur(7px);
+  -webkit-backdrop-filter: blur(7px);
 }
 
 /* ── Footer ── */
