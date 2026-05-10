@@ -1,6 +1,6 @@
 (function () {
-  const CHAR_W = 5.5;
-  const CHAR_H = 11.5;
+  const CHAR_W = 4.2;   // 7px monospace ≈ 4.2px wide
+  const CHAR_H = 9.0;   // 7px × 1.28 line-height ≈ 9px tall
 
   // Ordered sparse → dense; inverted brightness maps dark image areas to dense chars
   const RAMP   = ' .\'`^",:;Il!i~+_-?][}{1)(|/tfjrxnuvczXYUJCLQ0OZmwqpdbkhao*#MW&8%B@$';
@@ -37,7 +37,7 @@
     shape.height = H;
     out.width    = window.innerWidth;
     out.height   = window.innerHeight;
-    oCtx.font         = '9px monospace';
+    oCtx.font         = '7px monospace';
     oCtx.textBaseline = 'top';
   }
 
@@ -91,9 +91,9 @@
         const r = pixels[i], g = pixels[i + 1], b = pixels[i + 2], a = pixels[i + 3];
         if (a < 8) continue;
 
-        // Perceptual brightness, then contrast stretch so the full ramp is used
+        // Perceptual brightness with aggressive contrast stretch
         let bri = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
-        bri = clamp(0, (bri - 0.15) * 1.35, 1);  // stretch range [0.15–0.89] → [0–1]
+        bri = clamp(0, (bri - 0.10) * 1.55, 1);
 
         // Organic shimmer keeps it alive
         bri += 0.03 * Math.sin(x * 0.72 + t * 4.1) * Math.cos(y * 0.55 - t * 2.9);
@@ -102,7 +102,14 @@
         const ch = RAMP[Math.round((1 - bri) * rampN)];
         if (ch === ' ') continue;
 
-        oCtx.fillStyle = `rgb(${r},${g},${b})`;
+        // Saturation boost: push each channel away from grey
+        const grey = 0.299 * r + 0.587 * g + 0.114 * b;
+        const sat  = 3.0;
+        const sr = clamp(0, Math.round(grey + (r - grey) * sat), 255);
+        const sg = clamp(0, Math.round(grey + (g - grey) * sat), 255);
+        const sb = clamp(0, Math.round(grey + (b - grey) * sat), 255);
+
+        oCtx.fillStyle = `rgb(${sr},${sg},${sb})`;
         oCtx.fillText(ch, x * CHAR_W, y * CHAR_H);
       }
     }
