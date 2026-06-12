@@ -1,8 +1,5 @@
 :root {
   --mono: ui-monospace, "SF Mono", "Cascadia Code", Menlo, Consolas, "Liberation Mono", monospace;
-  --term-bg: #06060a;
-  --term-green: #7ee787;
-  --term-prompt: #3fb950;
 }
 
 html {
@@ -100,14 +97,6 @@ h2 {
   border-bottom: 1px solid #ddd;
 }
 
-h2::before {
-  content: "// ";
-  font-family: var(--mono);
-  font-size: 0.8em;
-  font-weight: normal;
-  color: #b0b0b0;
-}
-
 h3 {
   font-size: 17px;
   font-weight: bold;
@@ -140,15 +129,37 @@ hr {
   margin: 0 0 32px;
 }
 
-.subtitle::after {
-  content: "▍";
-  margin-left: 2px;
-  color: var(--term-prompt);
-  animation: blink 1.2s steps(2, start) infinite;
+/* ── ASCII art plates ──
+   Monochrome, static pieces set in white space like illustrations
+   in a printed book. Shrink-wrapped and centered. */
+
+.ascii-art {
+  display: table;
+  margin: 44px auto;
+  font-family: var(--mono);
+  font-size: 13px;
+  line-height: 1.25;
+  color: #1a1a1a;
+  white-space: pre;
 }
 
-@keyframes blink {
-  50% { opacity: 0; }
+.ascii-art.small {
+  font-size: 12px;
+  color: #444;
+  margin: 36px auto;
+}
+
+.ascii-caption {
+  text-align: center;
+  font-style: italic;
+  font-size: 14px;
+  color: #999;
+  margin: -28px 0 48px;
+}
+
+@media (max-width: 480px) {
+  .ascii-art { font-size: 10px; }
+  .ascii-art.small { font-size: 9px; }
 }
 
 /* ── Projects ── */
@@ -157,12 +168,11 @@ hr {
   border-left: 3px solid #ddd;
   padding-left: 16px;
   margin-bottom: 36px;
-  transition: border-left-color 0.2s ease, transform 0.2s ease;
+  transition: border-left-color 0.2s ease;
 }
 
 .project:hover {
-  border-left-color: #0000EE;
-  transform: translateX(2px);
+  border-left-color: #999;
 }
 
 .project-name {
@@ -209,13 +219,6 @@ hr {
   margin-right: 4px;
   display: inline-block;
   margin-bottom: 4px;
-  transition: background 0.15s ease, color 0.15s ease;
-}
-
-.tag:hover {
-  background: #111;
-  color: #7ee787;
-  border-color: #111;
 }
 
 /* ── Rotating cube (N3C project easter egg) ── */
@@ -265,93 +268,6 @@ hr {
     animation: none;
     transform: rotateY(-30deg) rotateX(-15deg);
   }
-  .subtitle::after {
-    animation: none;
-  }
-}
-
-/* ── Terminal window ──
-   Shared chrome for the home ASCII art panel, the about-page stack map,
-   and the contact-page typed session. */
-
-.term-window {
-  background: var(--term-bg);
-  border: 1px solid #2a2a33;
-  border-radius: 10px;
-  overflow: hidden;
-  margin: 28px 0 36px;
-  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.14);
-}
-
-.term-bar {
-  display: flex;
-  align-items: center;
-  gap: 7px;
-  padding: 9px 12px;
-  background: #101016;
-  border-bottom: 1px solid #1d1d26;
-}
-
-.dot {
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-}
-
-.dot-r { background: #ff5f57; }
-.dot-y { background: #febc2e; }
-.dot-g { background: #28c840; }
-
-.term-title {
-  font-family: var(--mono);
-  font-size: 11px;
-  color: #6e7681;
-  margin-left: 8px;
-}
-
-.term-body {
-  margin: 0;
-  padding: 14px 16px;
-  font-family: var(--mono);
-  font-size: 12.5px;
-  line-height: 1.55;
-  color: var(--term-green);
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-.term-body .term-prompt { color: var(--term-prompt); }
-.term-body .term-cmd    { color: #e6edf3; }
-.term-body .term-out    { color: var(--term-green); }
-
-.term-body a {
-  color: #79c0ff;
-}
-
-.term-body a:visited {
-  color: #79c0ff;
-}
-
-.term-caret {
-  display: inline-block;
-  color: var(--term-prompt);
-  animation: blink 1s steps(2, start) infinite;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .term-caret { animation: none; }
-}
-
-#terminal-session {
-  min-height: 14.5em;
-}
-
-/* ── ASCII art canvas (home) ── */
-
-#ascii-art {
-  display: block;
-  width: 100%;
-  height: 300px;
 }
 
 /* ── Footer ── */
