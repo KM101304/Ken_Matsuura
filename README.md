@@ -1,6 +1,6 @@
-# Ken Matsuura — Portfolio
+# Ken Matsuura — Personal Site
 
-Personal portfolio site deployed on GitHub Pages.
+Personal site deployed on GitHub Pages.
 
 **Live:** https://km101304.github.io/Ken_Matsuura/
 
@@ -8,23 +8,27 @@ Personal portfolio site deployed on GitHub Pages.
 
 ## What this is
 
-Terminal-aesthetic single-page portfolio. Covers my background, build philosophy, projects, and tech stack. Designed to feel like a personal operating system, not a generic developer template.
+Minimal multi-page personal site: home, projects, about, and contact. The home
+page renders an animated ASCII-art portrait on a canvas behind a frosted-glass
+content card; the inner pages are plain, fast, text-first HTML.
 
-## Sections
+## Pages
 
-- `~/story.log` — how I learned to build software (non-traditional path)
-- `~/projects` — GitHub systems archive with category filter
-- `~/stack.map` — tools and how they connect as a dependency graph
-- `~/build_philosophy` — how I think about software
-- `~/connect` — contact and channels
+- `index.html` — intro and current work, with the ASCII-art background
+- `projects.html` — project archive grouped by category
+- `about.html` — background, how I learned, what I use
+- `contact.html` — email and channels
+- `404.html` — custom not-found page (served by GitHub Pages)
 
 ## Stack
 
-Plain HTML / CSS / JavaScript. No framework, no build step, no dependencies beyond a Google Font. Deploys directly from `main` branch root.
+Plain HTML / CSS / JavaScript. No framework, no build step, no dependencies.
+Deploys directly from the repository root via GitHub Pages.
 
-## Editing projects
-
-Update [`assets/js/projects.js`](assets/js/projects.js) — each project is a plain object in the `PROJECTS` array. Fields: `name`, `type`, `category`, `status`, `featured`, `description`, `problem`, `stack`, `github`, `demo`, `learned`, `updated`.
+- `assets/css/style.css` — all styles
+- `assets/js/ascii-face.js` — ASCII portrait renderer (canvas, 12fps, respects
+  `prefers-reduced-motion`)
+- `assets/img/face.jpg` — source image for the ASCII portrait
 
 ## Local preview
 
