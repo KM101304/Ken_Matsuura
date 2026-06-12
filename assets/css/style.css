@@ -137,15 +137,16 @@ hr {
   display: table;
   margin: 44px auto;
   font-family: var(--mono);
-  font-size: 13px;
-  line-height: 1.25;
-  color: #1a1a1a;
+  font-size: 12px;
+  line-height: 1.2;
+  letter-spacing: 0;
+  color: #222;
   white-space: pre;
 }
 
 .ascii-art.small {
-  font-size: 12px;
-  color: #444;
+  font-size: 11px;
+  color: #333;
   margin: 36px auto;
 }
 
@@ -158,8 +159,8 @@ hr {
 }
 
 @media (max-width: 480px) {
-  .ascii-art { font-size: 10px; }
-  .ascii-art.small { font-size: 9px; }
+  .ascii-art { font-size: 8px; }
+  .ascii-art.small { font-size: 8px; }
 }
 
 /* ── Projects ── */
