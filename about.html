@@ -28,6 +28,24 @@
   <h1>About</h1>
   <p class="subtitle">How I got here and how I think about building things.</p>
 
+  <pre class="ascii-art small" aria-hidden="true">
+                                  ___
+                                 (   )
+                                  `-'
+
+           /\
+          /  \
+         /    '\
+        /  /\   \            /\
+       /  /  \   '.        /'  \
+      /  /    '.   \      / .   \
+     /  / ,''.  \   \    / / '.  \
+    /  ' /    \  '   '. / /    '  \
+   / .' /      '.      ' '      .  \
+  /  ' '         '              '   \
+~~~ ~~~~ ~~~~~~ ~~~~ ~~~~ ~~~~~ ~~~~ ~~
+   ~~~  ~~    ~~~~   ~~~   ~~~  ~~</pre>
+
   <h2>Background</h2>
 
   <p>
@@ -91,31 +109,15 @@
 
   <h2>What I use</h2>
 
-  <p>The stack, and how the pieces connect:</p>
-
-  <div class="term-window">
-    <div class="term-bar">
-      <span class="dot dot-r"></span>
-      <span class="dot dot-y"></span>
-      <span class="dot dot-g"></span>
-      <span class="term-title">~/ken — cat stack.map</span>
-    </div>
-    <pre class="term-body" aria-label="Stack diagram: frontend (React, Next.js, Tailwind, HTML/CSS) feeds backend (Python, Flask, Node); AI (OpenAI API, Claude API, local models via Ollama) exchanges with data (Supabase, PostgreSQL, Stripe payments); automation (n8n, scrapers, cron) feeds infra (Docker, Linux, GitHub, Vercel, Pages).">
-┌── frontend ─────────────┐     ┌── backend ──────────────┐
-│ react · next.js         │────▶│ python · flask · node   │
-│ tailwind · html/css     │     │                         │
-└─────────────────────────┘     └────────────┬────────────┘
-                                             │
-┌── ai ───────────────────┐     ┌── data ────▼────────────┐
-│ openai api · claude api │◀───▶│ supabase · postgresql   │
-│ local models · ollama   │     │ stripe payments         │
-└─────────────────────────┘     └────────────┬────────────┘
-                                             │
-┌── automation ───────────┐     ┌── infra ───▼────────────┐
-│ n8n · scrapers · cron   │────▶│ docker · linux          │
-│                         │     │ github · vercel · pages │
-└─────────────────────────┘     └─────────────────────────┘</pre>
-  </div>
+  <p>
+    Frontend: React, Next.js, Tailwind, plain HTML and CSS.<br />
+    Backend: Python, Flask, Node.js.<br />
+    Databases and auth: Supabase, PostgreSQL.<br />
+    Payments: Stripe.<br />
+    Automation: n8n, scraping pipelines, scheduled jobs.<br />
+    AI: OpenAI API, Claude API, local models via Ollama.<br />
+    Infrastructure: GitHub, Docker, Linux, Vercel, GitHub Pages.
+  </p>
 
   <hr />
 

@@ -9,27 +9,26 @@ Personal site deployed on GitHub Pages.
 ## What this is
 
 Minimal multi-page personal site: home, projects, about, and contact.
-Text-first serif pages with terminal-window accents — an animated ASCII
-torus-knot art piece on the home page, an ASCII stack diagram on the about
-page, and a typed shell session on the contact page.
+Text-first serif pages with static, monochrome ASCII art plates set in the
+white space like illustrations in a printed book — inspired by
+*Zen and the Art of the Macintosh*. A classic Mac on the home page, mountains
+on about, a sailboat on projects, a teacup on contact, an ensō on the 404.
 
 ## Pages
 
-- `index.html` — intro and current work, with the ASCII art panel
+- `index.html` — intro and current work
 - `projects.html` — project archive grouped by category
-- `about.html` — background, how I learned, stack map
-- `contact.html` — typed terminal session with email and channels
+- `about.html` — background, how I learned, what I use
+- `contact.html` — email and channels
 - `404.html` — custom not-found page (served by GitHub Pages)
 
 ## Stack
 
-Plain HTML / CSS / JavaScript. No framework, no build step, no dependencies.
-Deploys directly from the repository root via GitHub Pages.
+Plain HTML / CSS. No JavaScript, no framework, no build step, no
+dependencies. Deploys directly from the repository root via GitHub Pages.
 
 - `assets/css/style.css` — all styles
-- `assets/js/ascii-art.js` — ASCII torus-knot renderer (canvas, z-buffered,
-  pointer-reactive, respects `prefers-reduced-motion`)
-- `assets/js/terminal.js` — typed terminal session on the contact page
+- ASCII art lives inline in each page as `<pre class="ascii-art">` plates
 
 ## Local preview
 
