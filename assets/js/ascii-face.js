@@ -11,6 +11,8 @@
   let img, imgReady = false;
   let lastFrame = 0, t0;
   const FRAME_MS = 1000 / 12;   // 12fps — plenty smooth for a slow background drift
+  const reduceMotion = window.matchMedia &&
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
   function init() {
     out = document.getElementById('ascii-face');
@@ -21,24 +23,35 @@
     oCtx  = out.getContext('2d');
 
     img        = new Image();
-    img.onload = function () { imgReady = true; };
+    img.onload = function () {
+      imgReady = true;
+      if (reduceMotion) render(0);
+    };
     img.src    = 'assets/img/face.jpg';
 
     resize();
     window.addEventListener('resize', resize);
-    t0 = performance.now();
-    requestAnimationFrame(loop);
+    if (!reduceMotion) {
+      t0 = performance.now();
+      requestAnimationFrame(loop);
+    }
   }
 
   function resize() {
+    // Backing store scaled by devicePixelRatio so glyphs stay sharp on retina
+    const dpr = window.devicePixelRatio || 1;
     W = Math.ceil(window.innerWidth  / CHAR_W);
     H = Math.ceil(window.innerHeight / CHAR_H);
     shape.width  = W;
     shape.height = H;
-    out.width    = window.innerWidth;
-    out.height   = window.innerHeight;
+    out.width        = Math.round(window.innerWidth  * dpr);
+    out.height       = Math.round(window.innerHeight * dpr);
+    out.style.width  = window.innerWidth  + 'px';
+    out.style.height = window.innerHeight + 'px';
+    oCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
     oCtx.font         = '7px monospace';
     oCtx.textBaseline = 'top';
+    if (reduceMotion && imgReady) render(0);
   }
 
   function loop(now) {
