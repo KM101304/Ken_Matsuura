@@ -130,11 +130,12 @@ hr {
 }
 
 /* ── ASCII art plates ──
-   Monochrome, static pieces set in white space like illustrations
-   in a printed book. Shrink-wrapped and centered. */
+   Monochrome tonal pieces set in white space like printed plates. */
 
 .ascii-art {
   display: table;
+  max-width: 100%;
+  overflow-x: auto;
   margin: 44px auto;
   font-family: var(--mono);
   font-size: 12px;
@@ -148,14 +149,6 @@ hr {
   font-size: 11px;
   color: #333;
   margin: 36px auto;
-}
-
-.ascii-caption {
-  text-align: center;
-  font-style: italic;
-  font-size: 14px;
-  color: #999;
-  margin: -28px 0 48px;
 }
 
 @media (max-width: 480px) {
